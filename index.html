@@ -16,9 +16,23 @@
                 <h1>Benvenuto alla Festa! 🎉</h1>
                 <p>Inserisci il tuo nome per partecipare al gioco.</p>
                 <input type="text" id="playerName" placeholder="Il tuo nome..." />
-                <button onclick="register()">Entra nel Gioco</button>
+                <button onclick="startRegistration()">Entra nel Gioco</button>
                 <button class="secondary mt-3" onclick="showLeaderboard()">Vedi Classifica</button>
             </div>
+        </div>
+
+        <!-- View: Roulette -->
+        <div id="view-roulette" class="view">
+            <h1>Scegli la tua Carta!</h1>
+            <p>Premi il pulsante per fermare la ruota e scoprire la tua carta iniziale.</p>
+            
+            <div class="playing-card my-card">
+                <div class="card-corner top-left">❓</div>
+                <div class="card-value" id="rouletteValue">1</div>
+                <div class="card-corner bottom-right">❓</div>
+            </div>
+
+            <button id="btnStopRoulette" onclick="stopRoulette()">Ferma la Ruota!</button>
         </div>
 
         <!-- View: Dashboard -->

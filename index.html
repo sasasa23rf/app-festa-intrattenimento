@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gioco Festa</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <!-- View: Login -->
@@ -22,7 +24,7 @@
         <!-- View: Dashboard -->
         <div id="view-dashboard" class="view">
             <h1 id="welcomeMessage" class="welcome-title"></h1>
-            
+
             <div class="playing-card my-card">
                 <div class="card-corner top-left">⭐</div>
                 <div class="card-value" id="myCardValue">-</div>
@@ -70,17 +72,16 @@
         <div id="view-scan-result" class="view">
             <h1>Carta Trovata!</h1>
             <p>Hai trovato la carta di <strong id="scannedPlayerName" class="highlight-name"></strong></p>
-            
+
             <div class="playing-card scanned-card">
                 <div class="card-corner top-left">🎯</div>
                 <div class="card-value" id="scannedCardValue">-</div>
                 <div class="card-corner bottom-right">🎯</div>
             </div>
-            
+
             <div class="actions">
-                <button onclick="acceptCard()">Accetta Carta (+<span id="btnAcceptValue"></span>)</button>
+                <button id="btnAcceptCard" onclick="acceptCard()">Accetta Carta (+<span id="btnAcceptValue"></span>)</button>
                 <button class="danger mt-3" id="btnCancelCard" onclick="cancelCard()">Usa Carta "Annulla"</button>
-                <button class="secondary mt-3" onclick="showDashboard()">Annulla Operazione</button>
             </div>
         </div>
 
@@ -94,4 +95,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>

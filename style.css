@@ -356,7 +356,9 @@ button:disabled {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     border: 2px solid #e2e8f0;
     position: relative;
-    min-height: 100px;
+    min-height: 85px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .mini-card.empty-card {
@@ -375,9 +377,10 @@ button:disabled {
     background: #fee2e2;
     border-color: #ef4444;
     color: #dc2626;
-    font-size: 1.1rem;
-    line-height: 1.2;
+    font-size: 0.9rem;
+    line-height: 1.1;
     text-align: center;
+    padding: 2px;
 }
 
 .mini-card.cancel-card.used {

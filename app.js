@@ -113,9 +113,9 @@ function updateDashboard() {
     document.getElementById('scansLeft').innerText = currentPlayer.scansLeft;
     document.getElementById('cancelAvailable').innerText = currentPlayer.cancelAvailable > 0 ? 'Sì' : 'No';
 
-    const shortCodeEl = document.getElementById('myShortCode');
-    if (shortCodeEl) {
-        shortCodeEl.innerText = currentPlayer.shortCode || '-';
+    const fullCodeEl = document.getElementById('fullScreenCodeValue');
+    if (fullCodeEl) {
+        fullCodeEl.innerText = currentPlayer.shortCode || '-';
     }
 
     // Update collected cards list
@@ -234,7 +234,7 @@ async function processScannedCode(scannedText) {
 
 async function acceptCard() {
     if (autoAcceptInterval) clearInterval(autoAcceptInterval);
-    await processScan('accept');
+    await processScan('accept', true); // Silent accept
 }
 
 async function cancelCard() {
@@ -277,6 +277,15 @@ async function processScan(action, silent = false) {
         if (!silent) alert('Errore di connessione');
         showView('view-dashboard');
     }
+}
+
+// Modal functions
+function showMyCode() {
+    document.getElementById('fullScreenCodeOverlay').style.display = 'flex';
+}
+
+function hideMyCode() {
+    document.getElementById('fullScreenCodeOverlay').style.display = 'none';
 }
 
 // Leaderboard functionality

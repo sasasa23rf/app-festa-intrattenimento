@@ -20,7 +20,10 @@ function showView(viewId) {
 }
 
 // API Calls & Logic
-async function register() {
+let pendingRegistrationName = '';
+let rouletteInterval = null;
+
+async function startRegistration() {
     const nameInput = document.getElementById('playerName');
     const name = nameInput.value.trim();
 
@@ -29,26 +32,59 @@ async function register() {
         return;
     }
 
+    pendingRegistrationName = name;
+    showView('view-roulette');
+    startRoulette();
+}
+
+function startRoulette() {
+    const rValue = document.getElementById('rouletteValue');
+    const btnStop = document.getElementById('btnStopRoulette');
+    btnStop.disabled = false;
+    btnStop.innerText = 'Ferma la Ruota!';
+    
+    let currentVal = 1;
+    rouletteInterval = setInterval(() => {
+        currentVal++;
+        if (currentVal > 10) currentVal = 1;
+        rValue.innerText = currentVal;
+    }, 100);
+}
+
+async function stopRoulette() {
+    if (rouletteInterval) clearInterval(rouletteInterval);
+    
+    const btnStop = document.getElementById('btnStopRoulette');
+    btnStop.disabled = true;
+    btnStop.innerText = 'Carta Trovata!';
+    
+    const finalCard = parseInt(document.getElementById('rouletteValue').innerText);
+    
     try {
         const response = await fetch(`${API_URL}/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name })
+            body: JSON.stringify({ name: pendingRegistrationName, myCard: finalCard })
         });
 
         const data = await response.json();
         if (data.error) {
             alert(data.error);
+            showView('view-login');
             return;
         }
 
         localStorage.setItem('festa_player_id', data.id);
         currentPlayer = data;
-        updateDashboard();
-        showView('view-dashboard');
+        
+        setTimeout(() => {
+            updateDashboard();
+            showView('view-dashboard');
+        }, 1500);
     } catch (error) {
         console.error('Error:', error);
         alert('Errore durante la registrazione');
+        showView('view-login');
     }
 }
 
@@ -202,10 +238,8 @@ async function acceptCard() {
 }
 
 async function cancelCard() {
-    if (confirm('Sei sicuro di voler usare la tua unica carta "Annulla"? Non potrai più usarla in seguito!')) {
-        if (autoAcceptInterval) clearInterval(autoAcceptInterval);
-        await processScan('cancel');
-    }
+    if (autoAcceptInterval) clearInterval(autoAcceptInterval);
+    await processScan('cancel', true);
 }
 
 async function processScan(action, silent = false) {

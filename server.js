@@ -3,9 +3,18 @@ const cors = require('cors');
 const Database = require('better-sqlite3');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Check if index.html exists during server startup
+const indexPath = path.join(__dirname, 'public', 'index.html');
+if (!fs.existsSync(indexPath)) {
+    console.error(`Error: index.html not found at ${indexPath}`);
+} else {
+    console.log(`index.html found at ${indexPath}`);
+}
 
 app.use(cors());
 app.use(express.json());

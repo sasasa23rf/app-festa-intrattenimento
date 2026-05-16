@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
@@ -12,33 +12,31 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Initialize SQLite database
-const db = new sqlite3.Database('game.db', (err) => {
-    if (err) {
-        console.error('Error opening database', err.message);
-    } else {
-        db.run(`CREATE TABLE IF NOT EXISTS players (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            myCard INTEGER NOT NULL,
-            scansLeft INTEGER DEFAULT 3,
-            cancelAvailable INTEGER DEFAULT 1,
-            score INTEGER DEFAULT 0,
-            shortCode TEXT
-        )`);
+const db = new Database('game.db');
 
-        // Add shortCode column to existing database if it doesn't exist
-        db.run(`ALTER TABLE players ADD COLUMN shortCode TEXT`, (err) => {
-            // Ignore error if column already exists
-        });
+db.prepare(`CREATE TABLE IF NOT EXISTS players (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    myCard INTEGER NOT NULL,
+    scansLeft INTEGER DEFAULT 3,
+    cancelAvailable INTEGER DEFAULT 1,
+    score INTEGER DEFAULT 0,
+    shortCode TEXT
+)`).run();
 
-        db.run(`CREATE TABLE IF NOT EXISTS collected_cards (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            player_id TEXT NOT NULL,
-            scanned_player_id TEXT NOT NULL,
-            card_value INTEGER NOT NULL
-        )`);
-    }
-});
+// Add shortCode column to existing database if it doesn't exist
+try {
+    db.prepare(`ALTER TABLE players ADD COLUMN shortCode TEXT`).run();
+} catch (err) {
+    // Ignore error if column already exists
+}
+
+db.prepare(`CREATE TABLE IF NOT EXISTS collected_cards (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    player_id TEXT NOT NULL,
+    scanned_player_id TEXT NOT NULL,
+    card_value INTEGER NOT NULL
+)`).run();
 
 // Helper function to calculate score
 const updateScore = (playerId) => {

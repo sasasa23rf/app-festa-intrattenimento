@@ -12,8 +12,9 @@
     <div class="container">
         <!-- View: Login -->
         <div id="view-login" class="view active">
-            <div class="login-card">
-                <h1>Benvenuto alla Festa! 🎉</h1>
+            <div class="login-card" style="position: relative;">
+                <button onclick="document.getElementById('rulesOverlay').style.display = 'flex'" style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; padding: 0; font-size: 1.2rem; font-weight: bold; background: var(--secondary); display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">?</button>
+                <h1 style="margin-top: 15px;">Benvenuto alla Festa! 🎉</h1>
                 <p>Inserisci il tuo nome per partecipare al gioco.</p>
                 <input type="text" id="playerName" placeholder="Il tuo nome..." />
                 <button onclick="startRegistration()">Entra nel Gioco</button>
@@ -131,6 +132,27 @@
         <h2 style="font-size: 1.8rem; margin-bottom: 30px; text-align: center; color: white; padding: 0 20px;">Fai inserire questo codice<br>ai tuoi amici</h2>
         <div class="secret-code" id="fullScreenCodeValue" style="font-size: 4rem; padding: 20px 40px; color: var(--primary); background: white;">-</div>
         <button style="background: white; color: var(--primary); margin-top: 50px; width: 80%; max-width: 300px;" onclick="hideMyCode()">Chiudi</button>
+    </div>
+
+    <!-- Rules Overlay -->
+    <div id="rulesOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.7); z-index: 10000; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: white; border-radius: 16px; padding: 25px; max-width: 500px; width: 100%; max-height: 85vh; overflow-y: auto; color: var(--text-main); box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <h2 style="color: var(--primary); margin-bottom: 20px; text-align: center; font-size: 1.8rem;">Come si gioca? 🤔</h2>
+            
+            <p style="text-align: left; margin-bottom: 15px; font-size: 1rem;">Il gioco consiste nell'avere nel proprio mazzo <strong>4 carte</strong>: una viene pescata all'inizio e le altre 3 devi sceglierle tra i giocatori presenti. Vince chi ottiene la somma delle 4 carte più alta!</p>
+            
+            <p style="text-align: left; margin-bottom: 15px; font-size: 1rem;">Puoi decidere di prendere la carta di un qualsiasi player facendoti fornire il suo codice segreto e inserendolo nel tuo dispositivo. <strong>Lui non potrà rifiutarsi.</strong> Fai attenzione agli sguardi e agli scambi che effettuano gli altri giocatori per intuire se conviene o meno prendere la carta da loro.</p>
+            
+            <p style="text-align: left; margin-bottom: 15px; font-size: 1rem;">Dopo aver pescato la tua carta iniziale, potrai inserire un messaggio per dare un indizio agli altri. Questo servirà per far capire se hai una carta buona oppure no... o magari per bluffare, chissà!</p>
+            
+            <p style="text-align: left; margin-bottom: 15px; font-size: 1rem;">Nella <strong>Classifica Generale</strong> potrai vedere tutti i nomi con le loro frasi, e potrai vederne anche il punteggio, ma SOLO dopo che un giocatore avrà raccolto almeno due carte dagli altri. Non saprai mai se un giocatore ha già pescato due carte o se ne ha tre ed ha completato il suo mazzo, quindi resta sempre attento alla partita.</p>
+            
+            <p style="text-align: left; margin-bottom: 15px; font-size: 1rem;">Inoltre, avrai a disposizione una <strong>"Carta Annulla"</strong> per annullare uno scambio. Se ad esempio provi a prendere una carta da un amico ma scopri che ha un punteggio basso (es. 1), potrai scegliere di usare la Carta Annulla. Ricorda però che potrai farlo solo <strong>una volta</strong> in tutta la partita!</p>
+            
+            <p style="text-align: left; margin-bottom: 25px; font-size: 1rem;">Infine, dopo che tutti i giocatori avranno completato il loro mazzo (la carta iniziale + le 3 carte degli altri), la partita terminerà e uscirà la schermata del vincitore, colui che avrà ottenuto la somma più alta.</p>
+            
+            <button onclick="document.getElementById('rulesOverlay').style.display = 'none'" style="width: 100%; font-size: 1.1rem; padding: 15px;">Ho capito, iniziamo!</button>
+        </div>
     </div>
 
     <script src="app.js"></script>

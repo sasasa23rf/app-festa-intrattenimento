@@ -79,6 +79,11 @@
                 <div class="card-corner bottom-right">🎯</div>
             </div>
 
+            <!-- Timer UI -->
+            <div id="autoAcceptTimer" style="display: none; text-align: center; margin-top: 15px; font-weight: bold; color: var(--danger); font-size: 1.2rem;">
+                Auto-accettazione in: <span id="timerCountdown">5</span>s
+            </div>
+
             <div class="actions">
                 <button id="btnAcceptCard" onclick="acceptCard()">Accetta Carta (+<span id="btnAcceptValue"></span>)</button>
                 <button class="danger mt-3" id="btnCancelCard" onclick="cancelCard()">Usa Carta "Annulla"</button>

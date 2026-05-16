@@ -50,7 +50,7 @@
                     <div class="mini-card empty-card" id="miniCard1"><span id="miniCardValue1"></span></div>
                     <div class="mini-card empty-card" id="miniCard2"><span id="miniCardValue2"></span></div>
                     <div class="mini-card empty-card" id="miniCard3"><span id="miniCardValue3"></span></div>
-                    <div class="mini-card cancel-card" id="miniCancelCard"></div>
+                    <div class="mini-card cancel-card" id="miniCancelCard"><span id="miniCancelCardText">Annulla<br>disponibile</span></div>
                 </div>
             </div>
 
@@ -66,22 +66,21 @@
             </div>
 
             <div class="action-box">
-                <h3>Gioca con un amico</h3>
-                <p>Inserisci il suo codice segreto:</p>
+                <p style="font-weight: bold; margin-bottom: 10px;">Codice segreto giocatore:</p>
                 <div class="input-group">
                     <input type="text" id="manualCodeInput" placeholder="Codice..." maxlength="6" autocomplete="off" />
                     <button onclick="submitManualCode()">Cerca</button>
                 </div>
             </div>
 
-
-
-            <div class="my-code-box">
+            <div class="my-code-box" style="margin-bottom: 10px; border: none; padding-top: 0;">
                 <p>Il tuo codice:</p>
-                <button class="secondary" onclick="showMyCode()" style="margin-top: 10px;">Mostra Codice</button>
             </div>
 
-            <button class="secondary btn-bottom" onclick="showLeaderboard()">Vedi Classifica</button>
+            <div class="bottom-buttons" style="display: flex; gap: 10px; margin-top: auto;">
+                <button class="secondary" onclick="showMyCode()" style="margin: 0; flex: 1;">Mostra Codice</button>
+                <button class="secondary" onclick="showLeaderboard()" style="margin: 0; flex: 1;">Vedi Classifica</button>
+            </div>
         </div>
 
         <!-- View: Scan Result -->

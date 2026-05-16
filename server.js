@@ -103,6 +103,8 @@ app.post('/api/register', (req, res) => {
 
         db.prepare('INSERT INTO players (id, name, myCard, score, shortCode) VALUES (?, ?, ?, ?, ?)').run(id, name, myCard, myCard, shortCode);
         
+        checkAndManageKeepAlive(); // Check if we need to start pinging
+
         res.json({ id, name, myCard, scansLeft: 3, cancelAvailable: 1, score: myCard, collectedCards: [], shortCode });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -223,6 +225,59 @@ app.get('/api/leaderboard', (req, res) => {
         const rows = db.prepare(query).all();
         res.json(rows);
     } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// --- Admin & Keep Alive ---
+const RENDER_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}`;
+let keepAliveInterval = null;
+
+function checkAndManageKeepAlive() {
+    try {
+        const row = db.prepare('SELECT COUNT(*) as count FROM players').get();
+        if (row && row.count > 0) {
+            if (!keepAliveInterval) {
+                console.log("Starting keep-alive ping...");
+                keepAliveInterval = setInterval(() => {
+                    fetch(`${RENDER_URL}/api/ping`).catch(() => {});
+                }, 60000);
+            }
+        } else {
+            if (keepAliveInterval) {
+                console.log("Stopping keep-alive ping...");
+                clearInterval(keepAliveInterval);
+                keepAliveInterval = null;
+            }
+        }
+    } catch(err) {
+        console.error("Keep-alive check error:", err);
+    }
+}
+
+// Initial check on server start
+checkAndManageKeepAlive();
+
+app.get('/api/ping', (req, res) => res.send('pong'));
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+app.post('/api/admin/reset', (req, res) => {
+    const { password } = req.body;
+    if (password !== '0825') return res.status(403).json({ error: 'Password errata' });
+    
+    try {
+        db.prepare('DELETE FROM players').run();
+        db.prepare('DELETE FROM collected_cards').run();
+        pendingScans.forEach(timer => clearTimeout(timer));
+        pendingScans.clear();
+        
+        checkAndManageKeepAlive(); // will stop the ping since count is 0
+        
+        res.json({ success: true });
+    } catch(err) {
         res.status(500).json({ error: err.message });
     }
 });

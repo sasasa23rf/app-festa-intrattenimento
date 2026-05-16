@@ -39,13 +39,22 @@
         <div id="view-dashboard" class="view">
             <h1 id="welcomeMessage" class="welcome-title"></h1>
 
-            <div class="playing-card my-card">
-                <div class="card-corner top-left">⭐</div>
-                <div class="card-value" id="myCardValue">-</div>
-                <div class="card-corner bottom-right">⭐</div>
+            <div class="dashboard-top-section" style="display: flex; gap: 15px; margin-bottom: 25px; align-items: stretch;">
+                <div class="playing-card my-card" style="margin: 0; flex-shrink: 0; width: 140px; height: 190px;">
+                    <div class="card-corner top-left">⭐</div>
+                    <div class="card-value" id="myCardValue">-</div>
+                    <div class="card-corner bottom-right">⭐</div>
+                </div>
+                
+                <div class="mini-cards-grid" style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; flex-grow: 1;">
+                    <div class="mini-card empty-card" id="miniCard1"><span id="miniCardValue1"></span></div>
+                    <div class="mini-card empty-card" id="miniCard2"><span id="miniCardValue2"></span></div>
+                    <div class="mini-card empty-card" id="miniCard3"><span id="miniCardValue3"></span></div>
+                    <div class="mini-card cancel-card" id="miniCancelCard"></div>
+                </div>
             </div>
 
-            <div class="stats-grid">
+            <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
                 <div class="stat-box">
                     <span class="stat-label">Punteggio</span>
                     <strong id="totalScore" class="stat-value">-</strong>
@@ -53,10 +62,6 @@
                 <div class="stat-box">
                     <span class="stat-label">Mosse</span>
                     <strong id="scansLeft" class="stat-value">-</strong>
-                </div>
-                <div class="stat-box">
-                    <span class="stat-label">Annulla</span>
-                    <strong id="cancelAvailable" class="stat-value">-</strong>
                 </div>
             </div>
 
@@ -69,10 +74,7 @@
                 </div>
             </div>
 
-            <div class="collected-cards" id="collectedCardsContainer" style="display: none;">
-                <h3>Carte raccolte</h3>
-                <ul id="collectedCardsList"></ul>
-            </div>
+
 
             <div class="my-code-box">
                 <p>Il tuo codice:</p>

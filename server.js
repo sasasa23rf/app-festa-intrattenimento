@@ -86,8 +86,13 @@ function forceAccept(playerId, scannedId) {
     }
 }
 
+let registrationEnabled = false;
+
 // API: Register a new player
 app.post('/api/register', (req, res) => {
+    if (!registrationEnabled) {
+        return res.status(403).json({ error: 'Le iscrizioni al gioco sono attualmente chiuse. Attendi che l\'admin le apra.' });
+    }
     try {
         let { name, myCard, clue } = req.body;
         if (!name) return res.status(400).json({ error: 'Name is required' });
@@ -271,6 +276,16 @@ app.get('/api/game-status', (req, res) => {
 });
 
 // --- Admin & Keep Alive ---
+app.get('/api/admin/settings', (req, res) => {
+    res.json({ registrationEnabled });
+});
+
+app.post('/api/admin/settings/registration', (req, res) => {
+    const { password, enabled } = req.body;
+    if (password !== '0825') return res.status(401).json({ error: 'Non autorizzato' });
+    registrationEnabled = !!enabled;
+    res.json({ success: true, registrationEnabled });
+});
 const RENDER_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}`;
 let keepAliveInterval = null;
 

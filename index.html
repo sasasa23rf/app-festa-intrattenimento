@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gioco Festa</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- View: Login -->
+        <div id="view-login" class="view active">
+            <div class="login-card">
+                <h1>Benvenuto alla Festa! 🎉</h1>
+                <p>Inserisci il tuo nome per partecipare al gioco.</p>
+                <input type="text" id="playerName" placeholder="Il tuo nome..." />
+                <button onclick="register()">Entra nel Gioco</button>
+                <button class="secondary mt-3" onclick="showLeaderboard()">Vedi Classifica</button>
+            </div>
+        </div>
+
+        <!-- View: Dashboard -->
+        <div id="view-dashboard" class="view">
+            <h1 id="welcomeMessage" class="welcome-title"></h1>
+            
+            <div class="playing-card my-card">
+                <div class="card-corner top-left">⭐</div>
+                <div class="card-value" id="myCardValue">-</div>
+                <div class="card-corner bottom-right">⭐</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span class="stat-label">Punteggio</span>
+                    <strong id="totalScore" class="stat-value">-</strong>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Mosse</span>
+                    <strong id="scansLeft" class="stat-value">-</strong>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Annulla</span>
+                    <strong id="cancelAvailable" class="stat-value">-</strong>
+                </div>
+            </div>
+
+            <div class="action-box">
+                <h3>Gioca con un amico</h3>
+                <p>Inserisci il suo codice segreto:</p>
+                <div class="input-group">
+                    <input type="text" id="manualCodeInput" placeholder="Codice..." maxlength="6" autocomplete="off" />
+                    <button onclick="submitManualCode()">Cerca</button>
+                </div>
+            </div>
+
+            <div class="collected-cards" id="collectedCardsContainer" style="display: none;">
+                <h3>Carte raccolte</h3>
+                <ul id="collectedCardsList"></ul>
+            </div>
+
+            <div class="my-code-box">
+                <p>Fai inserire questo codice ai tuoi amici:</p>
+                <h2 id="myShortCode" class="secret-code">-</h2>
+            </div>
+
+            <button class="secondary btn-bottom" onclick="showLeaderboard()">Vedi Classifica</button>
+        </div>
+
+        <!-- View: Scan Result -->
+        <div id="view-scan-result" class="view">
+            <h1>Carta Trovata!</h1>
+            <p>Hai trovato la carta di <strong id="scannedPlayerName" class="highlight-name"></strong></p>
+            
+            <div class="playing-card scanned-card">
+                <div class="card-corner top-left">🎯</div>
+                <div class="card-value" id="scannedCardValue">-</div>
+                <div class="card-corner bottom-right">🎯</div>
+            </div>
+            
+            <div class="actions">
+                <button onclick="acceptCard()">Accetta Carta (+<span id="btnAcceptValue"></span>)</button>
+                <button class="danger mt-3" id="btnCancelCard" onclick="cancelCard()">Usa Carta "Annulla"</button>
+                <button class="secondary mt-3" onclick="showDashboard()">Annulla Operazione</button>
+            </div>
+        </div>
+
+        <!-- View: Leaderboard -->
+        <div id="view-leaderboard" class="view">
+            <h1>Classifica Generale 🏆</h1>
+            <ul id="leaderboardList" class="leaderboard-list"></ul>
+            <button class="secondary btn-bottom" onclick="goBackFromLeaderboard()">Torna Indietro</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

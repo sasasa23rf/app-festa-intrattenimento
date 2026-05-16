@@ -87,11 +87,16 @@ function forceAccept(playerId, scannedId) {
 // API: Register a new player
 app.post('/api/register', (req, res) => {
     try {
-        const { name } = req.body;
+        let { name, myCard } = req.body;
         if (!name) return res.status(400).json({ error: 'Name is required' });
 
         const id = uuidv4();
-        const myCard = Math.floor(Math.random() * 10) + 1; // 1 to 10
+        
+        // Use provided myCard, or generate a random one if invalid
+        myCard = parseInt(myCard);
+        if (isNaN(myCard) || myCard < 1 || myCard > 10) {
+            myCard = Math.floor(Math.random() * 10) + 1; // 1 to 10
+        }
         
         // Generate a random 6-character alphanumeric code
         const shortCode = Math.random().toString(36).substring(2, 8).toUpperCase();

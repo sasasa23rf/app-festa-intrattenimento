@@ -112,6 +112,18 @@
             <ul id="leaderboardList" class="leaderboard-list" style="margin-bottom: 10px;"></ul>
             <button class="secondary" onclick="goBackFromLeaderboard()">Torna Indietro</button>
         </div>
+
+        <!-- View: Game Over -->
+        <div id="view-game-over" class="view" style="justify-content: center; text-align: center;">
+            <h1 style="color: var(--primary); font-size: 2.2rem; margin-bottom: 25px;">🏁 Gioco Terminato 🏁</h1>
+            <p style="font-weight: bold; margin-bottom: 20px;">Tutti i giocatori hanno esaurito le mosse!</p>
+            
+            <div id="podiumContainer" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px;">
+                <!-- Podium injected here -->
+            </div>
+            
+            <button class="secondary" onclick="location.reload()">Torna alla Home</button>
+        </div>
     </div>
 
     <!-- Full Screen Code Overlay -->

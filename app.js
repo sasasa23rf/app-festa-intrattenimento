@@ -111,26 +111,33 @@ function updateDashboard() {
     document.getElementById('myCardValue').innerText = currentPlayer.myCard;
     document.getElementById('totalScore').innerText = currentPlayer.score;
     document.getElementById('scansLeft').innerText = currentPlayer.scansLeft;
-    document.getElementById('cancelAvailable').innerText = currentPlayer.cancelAvailable > 0 ? 'Sì' : 'No';
 
     const fullCodeEl = document.getElementById('fullScreenCodeValue');
     if (fullCodeEl) {
         fullCodeEl.innerText = currentPlayer.shortCode || '-';
     }
 
-    // Update collected cards list
-    const list = document.getElementById('collectedCardsList');
-    const container = document.getElementById('collectedCardsContainer');
-    list.innerHTML = '';
-    if (currentPlayer.collectedCards && currentPlayer.collectedCards.length > 0) {
-        container.style.display = 'block';
-        currentPlayer.collectedCards.forEach((card, index) => {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>Carta ${index + 1}</span> <strong style="color: var(--primary);">+${card.card_value}</strong>`;
-            list.appendChild(li);
-        });
+    // Update Annulla card status
+    const cancelCardEl = document.getElementById('miniCancelCard');
+    if (currentPlayer.cancelAvailable > 0) {
+        cancelCardEl.classList.remove('used');
     } else {
-        container.style.display = 'none';
+        cancelCardEl.classList.add('used');
+    }
+
+    // Update 3 collected cards
+    for (let i = 1; i <= 3; i++) {
+        const cardEl = document.getElementById(`miniCard${i}`);
+        const valEl = document.getElementById(`miniCardValue${i}`);
+        if (currentPlayer.collectedCards && currentPlayer.collectedCards[i - 1]) {
+            cardEl.classList.add('filled');
+            cardEl.classList.remove('empty-card');
+            valEl.innerText = `+${currentPlayer.collectedCards[i - 1].card_value}`;
+        } else {
+            cardEl.classList.remove('filled');
+            cardEl.classList.add('empty-card');
+            valEl.innerText = '';
+        }
     }
 }
 

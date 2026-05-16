@@ -17,7 +17,6 @@
                 <p>Inserisci il tuo nome per partecipare al gioco.</p>
                 <input type="text" id="playerName" placeholder="Il tuo nome..." />
                 <button onclick="startRegistration()">Entra nel Gioco</button>
-                <button class="secondary mt-3" onclick="showLeaderboard()">Vedi Classifica</button>
             </div>
         </div>
 
@@ -33,6 +32,12 @@
             </div>
 
             <button id="btnStopRoulette" onclick="stopRoulette()">Ferma la Ruota!</button>
+
+            <div id="clueContainer" style="display: none; margin-top: 20px;">
+                <p style="font-weight: bold; margin-bottom: 5px;">Aggiungi un indizio (max 100 car.):</p>
+                <input type="text" id="playerClue" maxlength="100" placeholder="Es. Sono vestito di rosso..." style="margin-bottom: 15px;" />
+                <button onclick="finishRegistration()">Continua</button>
+            </div>
         </div>
 
         <!-- View: Dashboard -->
@@ -104,8 +109,8 @@
         <!-- View: Leaderboard -->
         <div id="view-leaderboard" class="view">
             <h1>Classifica Generale 🏆</h1>
-            <ul id="leaderboardList" class="leaderboard-list"></ul>
-            <button class="secondary btn-bottom" onclick="goBackFromLeaderboard()">Torna Indietro</button>
+            <ul id="leaderboardList" class="leaderboard-list" style="margin-bottom: 10px;"></ul>
+            <button class="secondary" onclick="goBackFromLeaderboard()">Torna Indietro</button>
         </div>
     </div>
 

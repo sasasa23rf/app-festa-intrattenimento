@@ -302,15 +302,9 @@ function hideMyCode() {
 
 // Leaderboard functionality
 let previousView = 'view-login';
+let leaderboardInterval = null;
 
-async function showLeaderboard() {
-    // Save current view to go back
-    document.querySelectorAll('.view').forEach(v => {
-        if (v.classList.contains('active')) {
-            previousView = v.id;
-        }
-    });
-
+async function fetchAndRenderLeaderboard() {
     try {
         const response = await fetch(`${API_URL}/leaderboard`);
         const data = await response.json();
@@ -383,14 +377,27 @@ async function showLeaderboard() {
         if (data.length === 0) {
             list.innerHTML = '<li style="justify-content: center; color: var(--text-muted);">Nessun giocatore registrato</li>';
         }
-
-        showView('view-leaderboard');
     } catch (error) {
-        console.error('Error:', error);
-        alert('Errore durante il caricamento della classifica');
+        console.error('Error fetching leaderboard:', error);
     }
 }
 
+async function showLeaderboard() {
+    // Save current view to go back
+    document.querySelectorAll('.view').forEach(v => {
+        if (v.classList.contains('active') && v.id !== 'view-leaderboard') {
+            previousView = v.id;
+        }
+    });
+
+    await fetchAndRenderLeaderboard();
+    showView('view-leaderboard');
+
+    if (leaderboardInterval) clearInterval(leaderboardInterval);
+    leaderboardInterval = setInterval(fetchAndRenderLeaderboard, 1000);
+}
+
 function goBackFromLeaderboard() {
+    if (leaderboardInterval) clearInterval(leaderboardInterval);
     showView(previousView);
 }

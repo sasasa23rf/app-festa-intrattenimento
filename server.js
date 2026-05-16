@@ -233,6 +233,42 @@ app.get('/api/leaderboard', (req, res) => {
     }
 });
 
+// API: Game Status (Check if all players finished)
+app.get('/api/game-status', (req, res) => {
+    try {
+        const row = db.prepare('SELECT COUNT(*) as totalPlayers, SUM(scansLeft) as totalScansLeft FROM players').get();
+        if (!row || row.totalPlayers === 0) {
+            return res.json({ isOver: false });
+        }
+        
+        if (row.totalScansLeft === 0) {
+            // Game is over! Calculate winners
+            const players = db.prepare('SELECT name, score FROM players ORDER BY score DESC').all();
+            
+            const places = [];
+            let currentScore = -1;
+            let currentRank = 0;
+            
+            for (const p of players) {
+                if (p.score !== currentScore) {
+                    currentRank++;
+                    if (currentRank > 3) break;
+                    currentScore = p.score;
+                    places.push({ rank: currentRank, score: p.score, winners: [p.name] });
+                } else {
+                    places[places.length - 1].winners.push(p.name);
+                }
+            }
+            
+            return res.json({ isOver: true, places });
+        }
+        
+        res.json({ isOver: false });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // --- Admin & Keep Alive ---
 const RENDER_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}`;
 let keepAliveInterval = null;

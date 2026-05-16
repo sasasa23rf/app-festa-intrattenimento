@@ -375,12 +375,15 @@ button:disabled {
     background: #fee2e2;
     border-color: #ef4444;
     color: #dc2626;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    text-align: center;
 }
 
-.mini-card.cancel-card.used::after {
-    content: '❌';
-    position: absolute;
-    font-size: 4rem;
-    color: rgba(220, 38, 38, 0.85);
-    pointer-events: none;
+.mini-card.cancel-card.used {
+    text-decoration: line-through;
+    text-decoration-color: #dc2626;
+    text-decoration-thickness: 3px;
+    color: #fca5a5;
+    border-color: #fca5a5;
 }

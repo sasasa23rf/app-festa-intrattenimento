@@ -63,6 +63,27 @@ const updateScore = (playerId) => {
     return totalScore;
 };
 
+const pendingScans = new Map();
+
+function forceAccept(playerId, scannedId) {
+    try {
+        const existing = db.prepare('SELECT * FROM collected_cards WHERE player_id = ? AND scanned_player_id = ?').get(playerId, scannedId);
+        if (existing) return;
+        
+        const player = db.prepare('SELECT * FROM players WHERE id = ?').get(playerId);
+        if (!player || player.scansLeft <= 0) return;
+        
+        const scannedPlayer = db.prepare('SELECT myCard FROM players WHERE id = ?').get(scannedId);
+        if (!scannedPlayer) return;
+        
+        db.prepare('INSERT INTO collected_cards (player_id, scanned_player_id, card_value) VALUES (?, ?, ?)').run(playerId, scannedId, scannedPlayer.myCard);
+        db.prepare('UPDATE players SET scansLeft = scansLeft - 1 WHERE id = ?').run(playerId);
+        updateScore(playerId);
+    } catch(err) {
+        console.error("Force accept error:", err);
+    }
+}
+
 // API: Register a new player
 app.post('/api/register', (req, res) => {
     try {
@@ -103,10 +124,31 @@ app.get('/api/player/:id', (req, res) => {
 app.get('/api/preview/:scannedId', (req, res) => {
     try {
         const { scannedId } = req.params;
-        const player = db.prepare('SELECT id, name, myCard FROM players WHERE id = ? OR shortCode = ?').get(scannedId, scannedId);
+        const { playerId } = req.query;
+        if (!playerId) return res.status(400).json({ error: 'playerId required' });
+
+        const scannedPlayer = db.prepare('SELECT id, name, myCard FROM players WHERE id = ? OR shortCode = ?').get(scannedId, scannedId);
+        if (!scannedPlayer) return res.status(404).json({ error: 'Codice non trovato' });
+
+        if (playerId === scannedPlayer.id) return res.status(400).json({ error: 'Non puoi scansionare te stesso!' });
+
+        const player = db.prepare('SELECT * FROM players WHERE id = ?').get(playerId);
+        if (!player) return res.status(404).json({ error: 'Player non trovato' });
+        if (player.scansLeft <= 0) return res.status(400).json({ error: 'Non hai più scansioni disponibili' });
+
+        const existing = db.prepare('SELECT * FROM collected_cards WHERE player_id = ? AND scanned_player_id = ?').get(playerId, scannedPlayer.id);
+        if (existing) return res.status(400).json({ error: 'Hai già scansionato questo giocatore!' });
+
+        if (pendingScans.has(playerId)) clearTimeout(pendingScans.get(playerId));
         
-        if (!player) return res.status(404).json({ error: 'Player not found' });
-        res.json({ id: player.id, name: player.name, cardValue: player.myCard });
+        const timeoutDelay = player.cancelAvailable > 0 ? 12000 : 5000;
+        const timer = setTimeout(() => {
+            forceAccept(playerId, scannedPlayer.id);
+            pendingScans.delete(playerId);
+        }, timeoutDelay);
+        pendingScans.set(playerId, timer);
+
+        res.json({ id: scannedPlayer.id, name: scannedPlayer.name, cardValue: scannedPlayer.myCard, cancelAvailable: player.cancelAvailable });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -116,6 +158,11 @@ app.get('/api/preview/:scannedId', (req, res) => {
 app.post('/api/scan', (req, res) => {
     try {
         const { playerId, scannedId, action } = req.body; // action: 'accept' or 'cancel'
+
+        if (pendingScans.has(playerId)) {
+            clearTimeout(pendingScans.get(playerId));
+            pendingScans.delete(playerId);
+        }
 
         if (playerId === scannedId) {
             return res.status(400).json({ error: 'Non puoi scansionare te stesso!' });

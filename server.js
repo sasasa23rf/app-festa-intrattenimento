@@ -141,7 +141,7 @@ app.get('/api/preview/:scannedId', (req, res) => {
 
         if (pendingScans.has(playerId)) clearTimeout(pendingScans.get(playerId));
         
-        const timeoutDelay = player.cancelAvailable > 0 ? 12000 : 5000;
+        const timeoutDelay = player.cancelAvailable > 0 ? 7000 : 5000;
         const timer = setTimeout(() => {
             forceAccept(playerId, scannedPlayer.id);
             pendingScans.delete(playerId);

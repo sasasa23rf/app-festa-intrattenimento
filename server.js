@@ -33,12 +33,14 @@ db.prepare(`CREATE TABLE IF NOT EXISTS players (
     shortCode TEXT
 )`).run();
 
-// Add shortCode column to existing database if it doesn't exist
+// Add shortCode and clue columns to existing database if it doesn't exist
 try {
     db.prepare(`ALTER TABLE players ADD COLUMN shortCode TEXT`).run();
-} catch (err) {
-    // Ignore error if column already exists
-}
+} catch (err) {}
+
+try {
+    db.prepare(`ALTER TABLE players ADD COLUMN clue TEXT`).run();
+} catch (err) {}
 
 db.prepare(`CREATE TABLE IF NOT EXISTS collected_cards (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -87,7 +89,7 @@ function forceAccept(playerId, scannedId) {
 // API: Register a new player
 app.post('/api/register', (req, res) => {
     try {
-        let { name, myCard } = req.body;
+        let { name, myCard, clue } = req.body;
         if (!name) return res.status(400).json({ error: 'Name is required' });
 
         const id = uuidv4();
@@ -100,12 +102,13 @@ app.post('/api/register', (req, res) => {
         
         // Generate a random 6-character alphanumeric code
         const shortCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const safeClue = clue ? clue.substring(0, 100) : '';
 
-        db.prepare('INSERT INTO players (id, name, myCard, score, shortCode) VALUES (?, ?, ?, ?, ?)').run(id, name, myCard, myCard, shortCode);
+        db.prepare('INSERT INTO players (id, name, myCard, score, shortCode, clue) VALUES (?, ?, ?, ?, ?, ?)').run(id, name, myCard, myCard, shortCode, safeClue);
         
         checkAndManageKeepAlive(); // Check if we need to start pinging
 
-        res.json({ id, name, myCard, scansLeft: 3, cancelAvailable: 1, score: myCard, collectedCards: [], shortCode });
+        res.json({ id, name, myCard, scansLeft: 3, cancelAvailable: 1, score: myCard, collectedCards: [], shortCode, clue: safeClue });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -218,6 +221,7 @@ app.get('/api/leaderboard', (req, res) => {
             SELECT 
                 p.name, 
                 p.score, 
+                p.clue,
                 (3 - p.scansLeft) as cardsCollected 
             FROM players p 
             ORDER BY score DESC

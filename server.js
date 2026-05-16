@@ -224,6 +224,7 @@ app.get('/api/leaderboard', (req, res) => {
                 p.clue,
                 (3 - p.scansLeft) as cardsCollected 
             FROM players p 
+            WHERE LOWER(p.name) != 'rere'
             ORDER BY score DESC
         `;
         const rows = db.prepare(query).all();
@@ -236,14 +237,14 @@ app.get('/api/leaderboard', (req, res) => {
 // API: Game Status (Check if all players finished)
 app.get('/api/game-status', (req, res) => {
     try {
-        const row = db.prepare('SELECT COUNT(*) as totalPlayers, SUM(scansLeft) as totalScansLeft FROM players').get();
+        const row = db.prepare("SELECT COUNT(*) as totalPlayers, SUM(scansLeft) as totalScansLeft FROM players WHERE LOWER(name) != 'rere'").get();
         if (!row || row.totalPlayers === 0) {
             return res.json({ isOver: false });
         }
         
         if (row.totalScansLeft === 0) {
             // Game is over! Calculate winners
-            const players = db.prepare('SELECT name, score FROM players ORDER BY score DESC').all();
+            const players = db.prepare("SELECT name, score FROM players WHERE LOWER(name) != 'rere' ORDER BY score DESC").all();
             
             const places = [];
             let currentScore = -1;

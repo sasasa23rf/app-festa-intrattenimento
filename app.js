@@ -22,7 +22,7 @@ function showView(viewId) {
 async function register() {
     const nameInput = document.getElementById('playerName');
     const name = nameInput.value.trim();
-    
+
     if (!name) {
         alert('Per favore, inserisci un nome!');
         return;
@@ -34,7 +34,7 @@ async function register() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name })
         });
-        
+
         const data = await response.json();
         if (data.error) {
             alert(data.error);
@@ -59,7 +59,7 @@ async function loadPlayer(id) {
             showView('view-login');
             return;
         }
-        
+
         currentPlayer = await response.json();
         updateDashboard();
         showView('view-dashboard');
@@ -75,7 +75,7 @@ function updateDashboard() {
     document.getElementById('totalScore').innerText = currentPlayer.score;
     document.getElementById('scansLeft').innerText = currentPlayer.scansLeft;
     document.getElementById('cancelAvailable').innerText = currentPlayer.cancelAvailable > 0 ? 'Sì' : 'No';
-    
+
     const shortCodeEl = document.getElementById('myShortCode');
     if (shortCodeEl) {
         shortCodeEl.innerText = currentPlayer.shortCode || '-';
@@ -104,17 +104,17 @@ function showDashboard() {
 async function submitManualCode() {
     const input = document.getElementById('manualCodeInput');
     const code = input.value.trim().toUpperCase();
-    
+
     if (code.length !== 6) {
         alert('Il codice deve essere di 6 caratteri alfanumerici!');
         return;
     }
-    
+
     if (currentPlayer.scansLeft <= 0) {
         alert('Hai esaurito le mosse disponibili!');
         return;
     }
-    
+
     await processScannedCode(code);
     input.value = ''; // clear the input
 }
@@ -126,25 +126,44 @@ async function processScannedCode(scannedText) {
     }
 
     try {
-        const response = await fetch(`${API_URL}/preview/${scannedText}`);
+        const response = await fetch(`${API_URL}/preview/${scannedText}?playerId=${currentPlayer.id}`);
         const data = await response.json();
-        
+
         if (data.error) {
             alert(data.error);
             return;
         }
 
-        currentScannedPlayerId = data.id; 
+        currentScannedPlayerId = data.id;
         document.getElementById('scannedPlayerName').innerText = data.name;
         document.getElementById('scannedCardValue').innerText = data.cardValue;
         document.getElementById('btnAcceptValue').innerText = data.cardValue;
-        
+
         const btnCancel = document.getElementById('btnCancelCard');
-        if (currentPlayer.cancelAvailable > 0) {
+        const btnAccept = document.getElementById('btnAcceptCard');
+        
+        if (data.cancelAvailable > 0) {
             btnCancel.style.display = 'block';
+            btnAccept.style.display = 'block';
             btnCancel.disabled = false;
+            
+            // Go back automatically after 10s if the user hasn't clicked anything
+            setTimeout(() => {
+                if (document.getElementById('view-scan-result').classList.contains('active')) {
+                    showView('view-dashboard');
+                    loadPlayer(currentPlayer.id);
+                }
+            }, 10000);
         } else {
             btnCancel.style.display = 'none';
+            btnAccept.style.display = 'none';
+            
+            // Auto accept after 3s client side (server also auto-accepts, but client needs to go back)
+            setTimeout(async () => {
+                if (document.getElementById('view-scan-result').classList.contains('active')) {
+                    await processScan('accept', true);
+                }
+            }, 3000);
         }
 
         showView('view-scan-result');
@@ -164,7 +183,7 @@ async function cancelCard() {
     }
 }
 
-async function processScan(action) {
+async function processScan(action, silent = false) {
     try {
         const response = await fetch(`${API_URL}/scan`, {
             method: 'POST',
@@ -175,26 +194,28 @@ async function processScan(action) {
                 action: action
             })
         });
-        
+
         const data = await response.json();
-        
-        if (data.error) {
-            alert(data.error);
-        } else {
-            if (action === 'cancel') {
-                alert('Carta annullata con successo!');
+
+        if (!silent) {
+            if (data.error) {
+                alert(data.error);
             } else {
-                alert('Carta aggiunta con successo!');
+                if (action === 'cancel') {
+                    alert('Carta annullata con successo!');
+                } else {
+                    alert('Carta aggiunta con successo!');
+                }
             }
         }
-        
+
         // Go back and reload player data
         showView('view-dashboard');
         loadPlayer(currentPlayer.id);
-        
+
     } catch (error) {
         console.error('Error:', error);
-        alert('Errore di connessione');
+        if (!silent) alert('Errore di connessione');
         showView('view-dashboard');
     }
 }
@@ -213,14 +234,14 @@ async function showLeaderboard() {
     try {
         const response = await fetch(`${API_URL}/leaderboard`);
         const data = await response.json();
-        
+
         const list = document.getElementById('leaderboardList');
         list.innerHTML = '';
-        
+
         // Separate ranked (>= 2 cards) and unranked players
         const rankedPlayers = [];
         const unrankedPlayers = [];
-        
+
         data.forEach(player => {
             if (player.cardsCollected >= 2) {
                 rankedPlayers.push(player);
@@ -228,27 +249,27 @@ async function showLeaderboard() {
                 unrankedPlayers.push(player);
             }
         });
-        
+
         // Sort ranked players by score (already sorted from DB, but just in case)
         rankedPlayers.sort((a, b) => b.score - a.score);
-        
+
         // Render ranked players
         rankedPlayers.forEach((player, index) => {
             const li = document.createElement('li');
-            
+
             let medal = '';
             if (index === 0) medal = '🥇 ';
             else if (index === 1) medal = '🥈 ';
             else if (index === 2) medal = '🥉 ';
             else medal = `${index + 1}. `;
-            
+
             li.innerHTML = `
                 <span>${medal}${player.name}</span>
                 <strong>${player.score} pt</strong>
             `;
             list.appendChild(li);
         });
-        
+
         // Render unranked players at the bottom
         if (unrankedPlayers.length > 0) {
             if (rankedPlayers.length > 0) {
@@ -261,7 +282,7 @@ async function showLeaderboard() {
                 separator.innerHTML = '<em>In attesa di qualificarsi...</em>';
                 list.appendChild(separator);
             }
-            
+
             unrankedPlayers.forEach(player => {
                 const li = document.createElement('li');
                 li.style.opacity = '0.7';
@@ -272,11 +293,11 @@ async function showLeaderboard() {
                 list.appendChild(li);
             });
         }
-        
+
         if (data.length === 0) {
             list.innerHTML = '<li style="justify-content: center; color: var(--text-muted);">Nessun giocatore registrato</li>';
         }
-        
+
         showView('view-leaderboard');
     } catch (error) {
         console.error('Error:', error);

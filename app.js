@@ -1,6 +1,7 @@
 const API_URL = '/api';
 let currentPlayer = null;
 let currentScannedPlayerId = null;
+let autoAcceptInterval = null;
 
 // Initialization
 window.onload = () => {
@@ -141,29 +142,51 @@ async function processScannedCode(scannedText) {
 
         const btnCancel = document.getElementById('btnCancelCard');
         const btnAccept = document.getElementById('btnAcceptCard');
+        const timerDiv = document.getElementById('autoAcceptTimer');
+        const timerSpan = document.getElementById('timerCountdown');
+        
+        if (autoAcceptInterval) clearInterval(autoAcceptInterval);
         
         if (data.cancelAvailable > 0) {
             btnCancel.style.display = 'block';
             btnAccept.style.display = 'block';
             btnCancel.disabled = false;
+            timerDiv.style.display = 'block';
             
-            // Go back automatically after 10s if the user hasn't clicked anything
-            setTimeout(() => {
-                if (document.getElementById('view-scan-result').classList.contains('active')) {
-                    showView('view-dashboard');
-                    loadPlayer(currentPlayer.id);
+            let timeLeft = 5;
+            timerSpan.innerText = timeLeft;
+            
+            // Go back automatically after 5s if the user hasn't clicked anything
+            autoAcceptInterval = setInterval(async () => {
+                timeLeft--;
+                timerSpan.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(autoAcceptInterval);
+                    if (document.getElementById('view-scan-result').classList.contains('active')) {
+                        // Automatically accept if time runs out
+                        await processScan('accept', true);
+                    }
                 }
-            }, 10000);
+            }, 1000);
         } else {
             btnCancel.style.display = 'none';
             btnAccept.style.display = 'none';
+            timerDiv.style.display = 'block';
+            
+            let timeLeft = 3;
+            timerSpan.innerText = timeLeft;
             
             // Auto accept after 3s client side (server also auto-accepts, but client needs to go back)
-            setTimeout(async () => {
-                if (document.getElementById('view-scan-result').classList.contains('active')) {
-                    await processScan('accept', true);
+            autoAcceptInterval = setInterval(async () => {
+                timeLeft--;
+                timerSpan.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(autoAcceptInterval);
+                    if (document.getElementById('view-scan-result').classList.contains('active')) {
+                        await processScan('accept', true);
+                    }
                 }
-            }, 3000);
+            }, 1000);
         }
 
         showView('view-scan-result');
@@ -174,11 +197,13 @@ async function processScannedCode(scannedText) {
 }
 
 async function acceptCard() {
+    if (autoAcceptInterval) clearInterval(autoAcceptInterval);
     await processScan('accept');
 }
 
 async function cancelCard() {
     if (confirm('Sei sicuro di voler usare la tua unica carta "Annulla"? Non potrai più usarla in seguito!')) {
+        if (autoAcceptInterval) clearInterval(autoAcceptInterval);
         await processScan('cancel');
     }
 }

@@ -54,17 +54,19 @@ function startRoulette() {
 async function stopRoulette() {
     if (rouletteInterval) clearInterval(rouletteInterval);
     
-    const btnStop = document.getElementById('btnStopRoulette');
-    btnStop.disabled = true;
-    btnStop.innerText = 'Carta Trovata!';
-    
+    document.getElementById('btnStopRoulette').style.display = 'none';
+    document.getElementById('clueContainer').style.display = 'block';
+}
+
+async function finishRegistration() {
     const finalCard = parseInt(document.getElementById('rouletteValue').innerText);
+    const clue = document.getElementById('playerClue').value.trim();
     
     try {
         const response = await fetch(`${API_URL}/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: pendingRegistrationName, myCard: finalCard })
+            body: JSON.stringify({ name: pendingRegistrationName, myCard: finalCard, clue: clue })
         });
 
         const data = await response.json();
@@ -342,7 +344,10 @@ async function showLeaderboard() {
             else medal = `${index + 1}. `;
 
             li.innerHTML = `
-                <span>${medal}${player.name}</span>
+                <div style="display: flex; flex-direction: column;">
+                    <span>${medal}${player.name}</span>
+                    ${player.clue ? `<span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 4px;">Indizio: ${player.clue}</span>` : ''}
+                </div>
                 <strong>${player.score} pt</strong>
             `;
             list.appendChild(li);
@@ -365,7 +370,10 @@ async function showLeaderboard() {
                 const li = document.createElement('li');
                 li.style.opacity = '0.7';
                 li.innerHTML = `
-                    <span>- ${player.name}</span>
+                    <div style="display: flex; flex-direction: column;">
+                        <span>- ${player.name}</span>
+                        ${player.clue ? `<span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 4px;">Indizio: ${player.clue}</span>` : ''}
+                    </div>
                     <strong style="color: var(--text-muted); font-size: 0.9rem; font-weight: normal;">(Nasconde il punteggio)</strong>
                 `;
                 list.appendChild(li);

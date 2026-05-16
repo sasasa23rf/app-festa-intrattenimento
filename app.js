@@ -80,6 +80,8 @@ async function finishRegistration() {
         currentPlayer = data;
         
         setTimeout(() => {
+            document.getElementById('clueContainer').style.display = 'none';
+            startGameStatusPolling();
             updateDashboard();
             showView('view-dashboard');
         }, 1500);
@@ -102,6 +104,7 @@ async function loadPlayer(id) {
         currentPlayer = await response.json();
         updateDashboard();
         showView('view-dashboard');
+        startGameStatusPolling();
     } catch (error) {
         console.error('Error:', error);
         showView('view-login');
@@ -400,4 +403,53 @@ async function showLeaderboard() {
 function goBackFromLeaderboard() {
     if (leaderboardInterval) clearInterval(leaderboardInterval);
     showView(previousView);
+}
+
+// Game Status Polling
+let gameStatusInterval = null;
+
+function startGameStatusPolling() {
+    if (gameStatusInterval) return;
+    
+    gameStatusInterval = setInterval(async () => {
+        try {
+            const res = await fetch(`${API_URL}/game-status`);
+            const data = await res.json();
+            
+            if (data.isOver) {
+                clearInterval(gameStatusInterval);
+                showGameOver(data.places);
+            }
+        } catch (e) {
+            console.error('Status check error:', e);
+        }
+    }, 3000); // Check every 3 seconds
+}
+
+function showGameOver(places) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-game-over').classList.add('active');
+    
+    document.getElementById('fullScreenCodeOverlay').style.display = 'none';
+    
+    const container = document.getElementById('podiumContainer');
+    container.innerHTML = '';
+    
+    places.forEach(place => {
+        let medal = '';
+        let color = '';
+        let bgColor = '';
+        if (place.rank === 1) { medal = '🥇 1° POSTO'; color = '#fbbf24'; bgColor = 'rgba(251, 191, 36, 0.1)'; }
+        else if (place.rank === 2) { medal = '🥈 2° POSTO'; color = '#94a3b8'; bgColor = 'rgba(148, 163, 184, 0.1)'; }
+        else if (place.rank === 3) { medal = '🥉 3° POSTO'; color = '#b45309'; bgColor = 'rgba(180, 83, 9, 0.1)'; }
+        
+        const winnersNames = place.winners.join(' & ');
+        
+        container.innerHTML += `
+            <div style="background: ${bgColor}; border: 2px solid ${color}; padding: 15px; border-radius: 12px;">
+                <div style="color: ${color}; font-weight: bold; font-size: 1.2rem; margin-bottom: 5px;">${medal} (${place.score} pt)</div>
+                <div style="font-size: 1.6rem; font-weight: 800; text-transform: uppercase; color: var(--text-main);">${winnersNames}</div>
+            </div>
+        `;
+    });
 }

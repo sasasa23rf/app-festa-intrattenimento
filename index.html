@@ -39,14 +39,14 @@
         <div id="view-dashboard" class="view">
             <h1 id="welcomeMessage" class="welcome-title"></h1>
 
-            <div class="dashboard-top-section" style="display: flex; gap: 15px; margin-bottom: 25px; align-items: stretch;">
-                <div class="playing-card my-card" style="margin: 0; flex-shrink: 0; width: 140px; height: 190px;">
+            <div class="dashboard-top-section" style="display: flex; gap: 10px; margin-bottom: 25px; align-items: stretch;">
+                <div class="playing-card my-card" style="margin: 0; flex-shrink: 0; width: 130px; height: 180px;">
                     <div class="card-corner top-left">⭐</div>
                     <div class="card-value" id="myCardValue">-</div>
                     <div class="card-corner bottom-right">⭐</div>
                 </div>
                 
-                <div class="mini-cards-grid" style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; flex-grow: 1;">
+                <div class="mini-cards-grid" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: 1fr 1fr; gap: 8px; flex-grow: 1; min-width: 0;">
                     <div class="mini-card empty-card" id="miniCard1"><span id="miniCardValue1"></span></div>
                     <div class="mini-card empty-card" id="miniCard2"><span id="miniCardValue2"></span></div>
                     <div class="mini-card empty-card" id="miniCard3"><span id="miniCardValue3"></span></div>

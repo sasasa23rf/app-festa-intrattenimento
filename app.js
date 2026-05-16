@@ -119,10 +119,13 @@ function updateDashboard() {
 
     // Update Annulla card status
     const cancelCardEl = document.getElementById('miniCancelCard');
+    const cancelCardText = document.getElementById('miniCancelCardText');
     if (currentPlayer.cancelAvailable > 0) {
         cancelCardEl.classList.remove('used');
+        cancelCardText.innerHTML = 'Annulla<br>disponibile';
     } else {
         cancelCardEl.classList.add('used');
+        cancelCardText.innerHTML = 'Annulla<br>usato';
     }
 
     // Update 3 collected cards

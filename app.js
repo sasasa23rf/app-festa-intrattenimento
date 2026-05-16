@@ -48,7 +48,7 @@ function startRoulette() {
         currentVal++;
         if (currentVal > 10) currentVal = 1;
         rValue.innerText = currentVal;
-    }, 100);
+    }, 30); // 30ms is very fast, making it almost impossible to time accurately
 }
 
 async function stopRoulette() {

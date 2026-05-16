@@ -20,6 +20,16 @@
         
         <div class="admin-box" id="controlBox" style="display: none;">
             <h1>Pannello di Controllo</h1>
+            
+            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 2px solid #e2e8f0;">
+                <h3 style="margin-top: 0;">Stato Iscrizioni</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Seleziona se i giocatori possono iscriversi al gioco o meno.</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="btnRegEnable" onclick="toggleRegistration(true)" style="margin: 0; flex: 1; background: #22c55e; color: white;">Abilita</button>
+                    <button id="btnRegDisable" onclick="toggleRegistration(false)" style="margin: 0; flex: 1; background: #ef4444; color: white; opacity: 0.5;">Disabilita</button>
+                </div>
+            </div>
+
             <p style="color: var(--danger); font-weight: bold;">⚠️ ATTENZIONE ⚠️</p>
             <p>Questa azione eliminerà permanentemente tutti i giocatori e tutti i punteggi registrati nel database.</p>
             <button class="danger mt-3" onclick="resetDatabase()">Azzera Database Completo</button>
@@ -27,13 +37,53 @@
     </div>
 
     <script>
-        function loginAdmin() {
+        async function loginAdmin() {
             const pwd = document.getElementById('adminPwd').value;
             if (pwd === '0825') {
                 document.getElementById('loginBox').style.display = 'none';
                 document.getElementById('controlBox').style.display = 'block';
+                await fetchSettings();
             } else {
                 alert('Password errata!');
+            }
+        }
+
+        async function fetchSettings() {
+            try {
+                const res = await fetch('/api/admin/settings');
+                const data = await res.json();
+                updateRegistrationUI(data.registrationEnabled);
+            } catch (e) { console.error(e); }
+        }
+
+        function updateRegistrationUI(enabled) {
+            const btnEn = document.getElementById('btnRegEnable');
+            const btnDis = document.getElementById('btnRegDisable');
+            if (enabled) {
+                btnEn.style.opacity = '1';
+                btnDis.style.opacity = '0.5';
+            } else {
+                btnEn.style.opacity = '0.5';
+                btnDis.style.opacity = '1';
+            }
+        }
+
+        async function toggleRegistration(enabled) {
+            const pwd = document.getElementById('adminPwd').value;
+            try {
+                const res = await fetch('/api/admin/settings/registration', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pwd, enabled })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    updateRegistrationUI(data.registrationEnabled);
+                } else {
+                    alert('Errore: ' + data.error);
+                }
+            } catch(e) {
+                alert('Errore di connessione');
             }
         }
 
